@@ -1,0 +1,55 @@
+name: Deploy VICSpark Website
+
+# WHEN should the workflow run?
+on:
+  push:
+    branches:
+      - main
+
+  # Allows manual deployment
+  workflow_dispatch:
+
+# WHAT can the workflow access?
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Prevent competing deployments
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+
+  # Deployment job
+  deploy:
+
+    # GitHub Pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    # Temporary GitHub-hosted Ubuntu machine
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # 1. Get the repository
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      # 2. Prepare GitHub Pages
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      # 3. Package website
+      - name: Upload website
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: .
+
+      # 4. Deploy
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
