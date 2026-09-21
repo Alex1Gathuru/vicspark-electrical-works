@@ -20,15 +20,22 @@
         <span class="brand-mark">V</span>
         <span><strong>VIC<span>SPARK</span></strong><small>Electrical Works</small></span>
       </a>
-      <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu">
-        <span></span><span></span><span></span>
-      </button>
-      <div class="nav-links" id="nav-links">
-        <a href="#services">Services</a>
-        <a href="#about">About</a>
-        <a href="#products">Products</a>
-        <a href="#process">How We Work</a>
-        <a href="#contact" class="nav-cta">Get a Quote</a>
+      <div class="nav-right">
+        <div class="nav-links" id="nav-links">
+          <a href="#services">Services</a>
+          <a href="#about">About</a>
+          <a href="#products">Shop</a>
+          <a href="#process">How We Work</a>
+          <a href="#contact" class="nav-cta">Get a Quote</a>
+        </div>
+        <div class="nav-actions">
+          <button class="cart-trigger" type="button" aria-label="Open cart">
+            🛒 <span class="cart-count" hidden>0</span>
+          </button>
+          <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
       </div>
     </nav>
   </header>
@@ -143,15 +150,11 @@
     <section class="section products-section" id="products">
       <div class="container">
         <div class="section-heading compact">
-          <div><p class="eyebrow"><span></span> ELECTRICAL SUPPLIES</p><h2>Products for everyday<br /><em>electrical needs.</em></h2></div>
-          <p>Ask VICSpark about availability and pricing before visiting or placing an order.</p>
+          <div><p class="eyebrow"><span></span> SHOP ELECTRICAL SUPPLIES</p><h2>Products for everyday<br /><em>electrical needs.</em></h2></div>
+          <p>Add items to your cart and check out — we'll confirm your order over WhatsApp.</p>
         </div>
-        <div class="product-grid">
-          <div class="product-item"><div class="product-illustration cables"><i></i><i></i><i></i></div><h3>Electrical Cables</h3><p>Common wiring and cable requirements.</p></div>
-          <div class="product-item"><div class="product-illustration breaker"><span></span><span></span><span></span></div><h3>Breakers & Protection</h3><p>Protection components and accessories.</p></div>
-          <div class="product-item"><div class="product-illustration socket"><span></span></div><h3>Switches & Sockets</h3><p>Everyday electrical fittings.</p></div>
-          <div class="product-item"><div class="product-illustration bulb">💡</div><h3>Lighting & Bulbs</h3><p>Lighting products and fittings.</p></div>
-        </div>
+        <div class="filter-tabs" id="filterTabs"></div>
+        <div class="product-grid" id="shopGrid"></div>
       </div>
     </section>
 
@@ -209,8 +212,7 @@
           </label>
           <label>Project / issue details<textarea name="details" rows="5" placeholder="Tell us what you need..." required></textarea></label>
           <button class="btn btn-primary form-submit" type="submit">Send Request via WhatsApp <span>↗</span></button>
-          <p class="form-note">No backend is required for this starter site — submissions open WhatsApp with your request pre-filled.</p>
-        </form>
+          
       </div>
     </section>
   </main>
@@ -224,6 +226,48 @@
     <div class="container footer-bottom"><span>© <span id="year"></span> alex.gathuru.dev@gmail.com. All rights reserved.</span><a href="#top">Back to top ↑</a></div>
   </footer>
 
+  <!-- Cart drawer -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <aside class="cart-drawer" id="cartDrawer" aria-label="Shopping cart">
+    <div class="cart-head">
+      <h3>Your Cart</h3>
+      <button class="cart-close" id="cartClose" type="button" aria-label="Close cart">×</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-summary">
+      <div class="cart-summary-row total"><span>Subtotal</span><span id="cartSubtotal">KES 0</span></div>
+      <button class="btn btn-primary cart-checkout-btn" id="cartCheckoutBtn" type="button">Checkout via WhatsApp <span>↗</span></button>
+      <button class="cart-continue" id="cartContinue" type="button">Continue browsing</button>
+    </div>
+  </aside>
+
+  <!-- Checkout modal -->
+  <div class="modal-overlay" id="checkoutOverlay">
+    <div class="modal">
+      <h3>Complete your order</h3>
+      <p>We'll open WhatsApp with your order details pre-filled to confirm price, stock and delivery.</p>
+      <form id="checkoutForm">
+        <label>Full name<input type="text" name="name" placeholder="Your name" required /></label>
+        <label>Phone number<input type="tel" name="phone" placeholder="07xx xxx xxx" required /></label>
+        <label>Delivery or pickup?
+          <select name="fulfilment" required style="display:block;width:100%;border:1px solid #d8dee8;border-radius:10px;padding:12px 13px;margin-top:6px;font:inherit;font-size:13px;color:#111a2d;background:#fff">
+            <option value="">Select an option</option>
+            <option>Pickup in Malindi</option>
+            <option>Delivery</option>
+          </select>
+        </label>
+        <label>Delivery address / notes<textarea name="notes" rows="3" placeholder="Optional"></textarea></label>
+        <div class="modal-actions">
+          <button type="button" class="btn modal-cancel" id="checkoutCancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Send Order <span>↗</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
   <script src="js/main.js"></script>
+  <script src="js/shop.js"></script>
 </body>
 </html>
