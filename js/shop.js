@@ -1,28 +1,18 @@
 /* ============ VICSpark Shop: product catalog + cart + WhatsApp checkout ============
    No backend required. Cart state lives in localStorage on the customer's device.
-   Prices are examples — edit the PRODUCTS array below with real prices/stock. */
+   Products and prices come from the SQL catalog (db/seed.sql) via data/products.json. */
 
 const WHATSAPP_NUMBER = '254791495748';
 const CURRENCY = 'KES';
 
-const PRODUCTS = [
-  { id: 'cbl-25', name: '2.5mm² Single Core Cable (100m roll)', category: 'cables', price: 3500, icon: '🔌', stock: 'in' },
-  { id: 'cbl-40', name: '4.0mm² Single Core Cable (100m roll)', category: 'cables', price: 5200, icon: '🔌', stock: 'in' },
-  { id: 'brk-1p', name: 'Single Pole MCB Breaker', category: 'breakers', price: 450, icon: '⚙', stock: 'in' },
-  { id: 'brk-3p', name: '3-Phase MCB Breaker', category: 'breakers', price: 1800, icon: '⚙', stock: 'low' },
-  { id: 'sw-1g', name: '1-Gang Wall Switch', category: 'switches', price: 250, icon: '◈', stock: 'in' },
-  { id: 'sk-13a', name: '13A Wall Socket', category: 'switches', price: 350, icon: '◈', stock: 'in' },
-  { id: 'led-9w', name: 'LED Bulb 9W', category: 'lighting', price: 200, icon: '💡', stock: 'in' },
-  { id: 'led-12w', name: 'LED Bulb 12W', category: 'lighting', price: 280, icon: '💡', stock: 'in' }
-];
+const CATALOG_URL = 'data/products.json'; // generated from db/schema.sql + db/seed.sql by scripts/build_catalog.py
 
-const CATEGORIES = [
-  { id: 'all', label: 'All Products' },
-  { id: 'cables', label: 'Cables' },
-  { id: 'breakers', label: 'Breakers & Protection' },
-  { id: 'switches', label: 'Switches & Sockets' },
-  { id: 'lighting', label: 'Lighting & Bulbs' }
-];
+let PRODUCTS = [];
+let CATEGORIES = [{ id: 'all', label: 'All Products' }];
+
+// Escape anything that goes into innerHTML.
+const esc = (v) =>
+  String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 const money = (n) => `${CURRENCY} ${n.toLocaleString('en-KE')}`;
 
@@ -30,7 +20,8 @@ const money = (n) => `${CURRENCY} ${n.toLocaleString('en-KE')}`;
 function loadCart() {
   try {
     const raw = localStorage.getItem('vicspark-cart');
-    return raw ? JSON.parse(raw) : {};
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
   } catch {
     return {};
   }
@@ -54,15 +45,29 @@ function cartTotal() {
   }, 0);
 }
 
+// Drop saved items that no longer exist in the catalog (e.g. from an older version of the shop).
+function pruneCart() {
+  const known = new Set(PRODUCTS.map((p) => p.id));
+  let changed = false;
+  for (const id of Object.keys(cart)) {
+    if (!known.has(id) || !(cart[id] > 0)) {
+      delete cart[id];
+      changed = true;
+    }
+  }
+  if (changed) saveCart(cart);
+}
+
 /* ---------- Rendering: product grid ---------- */
 const grid = document.querySelector('#shopGrid');
 const tabsWrap = document.querySelector('#filterTabs');
 let activeCategory = 'all';
+let searchTerm = '';
 
 function renderTabs() {
   if (!tabsWrap) return;
   tabsWrap.innerHTML = CATEGORIES.map(
-    (c) => `<button class="filter-tab${c.id === activeCategory ? ' active' : ''}" data-cat="${c.id}">${c.label}</button>`
+    (c) => `<button class="filter-tab${c.id === activeCategory ? ' active' : ''}" data-cat="${esc(c.id)}">${esc(c.label)}</button>`
   ).join('');
   tabsWrap.querySelectorAll('.filter-tab').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -75,7 +80,13 @@ function renderTabs() {
 
 function renderProducts() {
   if (!grid) return;
-  const items = PRODUCTS.filter((p) => activeCategory === 'all' || p.category === activeCategory);
+  const items = PRODUCTS.filter(
+    (p) => (activeCategory === 'all' || p.category === activeCategory) && p.name.toLowerCase().includes(searchTerm)
+  );
+  if (items.length === 0) {
+    grid.innerHTML = '<p class="shop-empty">No products match your search. Try another word or category.</p>';
+    return;
+  }
   grid.innerHTML = items
     .map((p) => {
       const qtyInCart = cart[p.id] || 0;
@@ -86,10 +97,10 @@ function renderProducts() {
           ? '<span class="stock-flag" style="color:#c0392b;background:#fdecea">OUT OF STOCK</span>'
           : '<span class="stock-flag">IN STOCK</span>';
       return `
-      <div class="product-item${p.stock === 'out' ? ' out-of-stock' : ''}" data-id="${p.id}">
-        <div class="product-illustration"><span style="font-size:52px">${p.icon}</span></div>
+      <div class="product-item${p.stock === 'out' ? ' out-of-stock' : ''}" data-id="${esc(p.id)}">
+        <div class="product-illustration">${p.image ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" />` : `<span style="font-size:52px">${esc(p.icon)}</span>`}</div>
         ${stockFlag}
-        <h3>${p.name}</h3>
+        <h3>${esc(p.name)}</h3>
         <div class="price-row">
           <span class="product-price">${money(p.price)}</span>
           <div class="qty-stepper">
@@ -98,7 +109,7 @@ function renderProducts() {
             <button type="button" class="qty-plus" aria-label="Increase quantity">+</button>
           </div>
         </div>
-        <button type="button" class="add-to-cart" data-id="${p.id}">${qtyInCart > 0 ? `In cart (${qtyInCart}) · Add more` : 'Add to Cart'} <span>+</span></button>
+        <button type="button" class="add-to-cart" data-id="${esc(p.id)}">${qtyInCart > 0 ? `In cart (${qtyInCart}) · Add more` : 'Add to Cart'} <span>+</span></button>
       </div>`;
     })
     .join('');
@@ -160,10 +171,10 @@ function renderCart() {
         const p = PRODUCTS.find((x) => x.id === id);
         if (!p) return '';
         return `
-        <div class="cart-item" data-id="${id}">
-          <div class="cart-item-thumb">${p.icon}</div>
+        <div class="cart-item" data-id="${esc(id)}">
+          <div class="cart-item-thumb">${esc(p.icon)}</div>
           <div>
-            <p class="cart-item-name">${p.name}</p>
+            <p class="cart-item-name">${esc(p.name)}</p>
             <p class="cart-item-price">${money(p.price)} × ${qty} = <strong>${money(p.price * qty)}</strong></p>
           </div>
           <div class="cart-item-right">
@@ -294,7 +305,39 @@ function showToast(text) {
   toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
 }
 
-/* ---------- Init ---------- */
-renderTabs();
-renderProducts();
-updateCartBadge();
+/* ---------- Search ---------- */
+document.querySelector('#shopSearch')?.addEventListener('input', (e) => {
+  searchTerm = e.target.value.trim().toLowerCase();
+  renderProducts();
+});
+
+/* ---------- Init: load the catalog, then render ---------- */
+async function init() {
+  try {
+    const res = await fetch(CATALOG_URL, { cache: 'no-cache' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const icons = Object.fromEntries(data.categories.map((c) => [c.id, c.icon]));
+    CATEGORIES = [{ id: 'all', label: 'All Products' }, ...data.categories.map((c) => ({ id: c.id, label: c.name }))];
+    PRODUCTS = data.products.map((p) => ({
+      id: p.sku,
+      name: p.name,
+      category: p.category,
+      price: p.price,
+      stock: p.stock,
+      image: p.image,
+      icon: icons[p.category] || '📦'
+    }));
+  } catch (err) {
+    console.error('Could not load the product catalog', err);
+    if (grid) {
+      grid.innerHTML = `<p class="shop-error">The product list could not be loaded. Please refresh, or <a href="https://wa.me/${WHATSAPP_NUMBER}" target="_blank" rel="noopener">WhatsApp us</a> to order.</p>`;
+    }
+    return;
+  }
+  pruneCart();
+  renderTabs();
+  renderProducts();
+  updateCartBadge();
+}
+init();

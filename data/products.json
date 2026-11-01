@@ -1,0 +1,339 @@
+{
+  "currency": "KES",
+  "categories": [
+    {
+      "id": "bulbs",
+      "name": "Bulbs",
+      "icon": "💡"
+    },
+    {
+      "id": "switches-sockets",
+      "name": "Switches & Sockets",
+      "icon": "🔌"
+    },
+    {
+      "id": "holders-fittings",
+      "name": "Holders & Fittings",
+      "icon": "🔩"
+    },
+    {
+      "id": "boxes-covers",
+      "name": "Boxes & Covers",
+      "icon": "📦"
+    },
+    {
+      "id": "tube-lights",
+      "name": "Tubes & LED Lights",
+      "icon": "🔦"
+    },
+    {
+      "id": "cords-accessories",
+      "name": "Cords & Accessories",
+      "icon": "🧰"
+    },
+    {
+      "id": "sensors-controls",
+      "name": "Sensors & Controls",
+      "icon": "⚙"
+    }
+  ],
+  "products": [
+    {
+      "sku": "BLB-5W-PIN",
+      "category": "bulbs",
+      "name": "5W Pin Bulb",
+      "description": null,
+      "price": 100,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "BLB-7W-PIN",
+      "category": "bulbs",
+      "name": "7W Pin Bulb",
+      "description": null,
+      "price": 150,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "BLB-9W-PIN",
+      "category": "bulbs",
+      "name": "9W Pin Bulb",
+      "description": null,
+      "price": 150,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "BLB-9W-SCR",
+      "category": "bulbs",
+      "name": "9W Screw Bulb",
+      "description": null,
+      "price": 150,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "BLB-12W-PIN",
+      "category": "bulbs",
+      "name": "12W Pin Bulb",
+      "description": null,
+      "price": 200,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "BLB-12W-SCR",
+      "category": "bulbs",
+      "name": "12W Screw Bulb",
+      "description": null,
+      "price": 250,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "BLB-SENSOR",
+      "category": "bulbs",
+      "name": "Sensor Bulb",
+      "description": null,
+      "price": 350,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "SWT-1G",
+      "category": "switches-sockets",
+      "name": "1 Gang Switch",
+      "description": null,
+      "price": 150,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "SWT-2G",
+      "category": "switches-sockets",
+      "name": "2 Gang Switch",
+      "description": null,
+      "price": 200,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "SWT-3G",
+      "category": "switches-sockets",
+      "name": "3 Gang Switch",
+      "description": null,
+      "price": 300,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "SWT-4G",
+      "category": "switches-sockets",
+      "name": "4 Gang Switch",
+      "description": null,
+      "price": 300,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "SKT-13A-1",
+      "category": "switches-sockets",
+      "name": "13A Single Socket",
+      "description": null,
+      "price": 200,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "SKT-13A-2",
+      "category": "switches-sockets",
+      "name": "13A Twin Socket",
+      "description": null,
+      "price": 350,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "PLG-13A-TOP",
+      "category": "switches-sockets",
+      "name": "13A Top Plug",
+      "description": null,
+      "price": 100,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "HLD-STRAIGHT",
+      "category": "holders-fittings",
+      "name": "Straight Holder",
+      "description": null,
+      "price": 100,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "HLD-ANGLE",
+      "category": "holders-fittings",
+      "name": "Angle Lamp Holder",
+      "description": null,
+      "price": 150,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "HLD-HANGING",
+      "category": "holders-fittings",
+      "name": "Hanging Holder",
+      "description": null,
+      "price": 100,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "FIT-CEILING-ROSE",
+      "category": "holders-fittings",
+      "name": "Ceiling Rose",
+      "description": null,
+      "price": 200,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "BOX-PAT-1",
+      "category": "boxes-covers",
+      "name": "Single Pattress Box",
+      "description": null,
+      "price": 40,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "BOX-PAT-2",
+      "category": "boxes-covers",
+      "name": "Twin Pattress Box",
+      "description": null,
+      "price": 50,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "COV-ROUND",
+      "category": "boxes-covers",
+      "name": "Round Cover",
+      "description": null,
+      "price": 20,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "COV-SQ-1",
+      "category": "boxes-covers",
+      "name": "Single Square Cover",
+      "description": null,
+      "price": 50,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "COV-SQ-2",
+      "category": "boxes-covers",
+      "name": "Twin Square Cover",
+      "description": null,
+      "price": 70,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "LGT-LED-4FT-DP",
+      "category": "tube-lights",
+      "name": "4ft Dust Proof LED Light",
+      "description": null,
+      "price": 500,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "LGT-LED-2FT-DP",
+      "category": "tube-lights",
+      "name": "2ft Dust Proof LED Light",
+      "description": null,
+      "price": 350,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "LGT-TUBE-4FT",
+      "category": "tube-lights",
+      "name": "4ft Tube Light",
+      "description": null,
+      "price": 250,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "LGT-TUBE-2FT",
+      "category": "tube-lights",
+      "name": "2ft Tube Light",
+      "description": null,
+      "price": 200,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "EXT-4W-POWER",
+      "category": "cords-accessories",
+      "name": "Extension Cord 4-Way (Power)",
+      "description": null,
+      "price": 500,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "EXT-4W-ASTRA",
+      "category": "cords-accessories",
+      "name": "Extension Cord 4-Way (Astra)",
+      "description": null,
+      "price": 600,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "ACC-FAN-CAP",
+      "category": "cords-accessories",
+      "name": "Fan Capacitor",
+      "description": null,
+      "price": 200,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "ACC-TAPE",
+      "category": "cords-accessories",
+      "name": "Insulation Tape",
+      "description": null,
+      "price": 100,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "SNS-FLOAT",
+      "category": "sensors-controls",
+      "name": "Float Switch",
+      "description": null,
+      "price": 1000,
+      "stock": "in",
+      "image": null
+    },
+    {
+      "sku": "SNS-DAYNIGHT",
+      "category": "sensors-controls",
+      "name": "Day/Night Light Sensor",
+      "description": null,
+      "price": 1000,
+      "stock": "in",
+      "image": null
+    }
+  ]
+}
