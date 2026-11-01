@@ -1,67 +1,72 @@
 # VICSpark Electrical Works Website
 
-A responsive, mobile-first website for **VICSpark Electrical Works, Malindi**, built with:
+Responsive, mobile-first website and simple online shop for **VICSpark Electrical Works, Malindi**.
+Plain HTML, CSS and JavaScript. No framework. Orders are confirmed over WhatsApp.
 
-- HTML5
-- CSS3
-- Vanilla JavaScript
-- No framework or build step
-- WhatsApp-based service request **and** e-commerce checkout flow
+## How it works
 
-## E-commerce features (new)
+```
+db/schema.sql ─┐                                   ┌─> index.html + js/shop.js
+               ├─> scripts/build_catalog.py ─────> data/products.json ──> (cart, search, checkout)
+db/seed.sql  ──┘   (validates, exports JSON)        └─ published to GitHub Pages by CI
+```
 
-- **Product catalog** (`js/shop.js`) — 8 example products across 4 categories (cables, breakers, switches/sockets, lighting), each with price, stock flag and icon. Edit the `PRODUCTS` array to add real items, prices and stock status.
-- **Category filter tabs** above the shop grid.
-- **Quantity stepper + Add to Cart** on every product card.
-- **Persistent cart** — stored in the customer's browser via `localStorage`, survives page reloads.
-- **Cart drawer** — slide-in panel with item list, quantity editing, remove, and running subtotal.
-- **Checkout modal** — collects name, phone, delivery/pickup preference and notes, then builds an itemized order message and opens WhatsApp to confirm the sale (same no-backend pattern as the original quote form).
-- **Toast notifications** for cart actions.
+- **`db/schema.sql`**: relational schema (`categories`, `products`, plus `orders` and `order_items` for a future backend, and a `v_catalog` view). Money is whole KES. Constraints block bad data (price must be above 0, stock is `in`/`low`/`out`, foreign keys enforced).
+- **`db/seed.sql`**: the product catalog (33 products in 7 categories). This is the source of truth.
+- **`scripts/build_catalog.py`**: builds an in-memory SQLite database from the two files, validates it, and writes `data/products.json`. Python standard library only.
+- **`js/shop.js`**: loads `data/products.json`, then renders category tabs, search, product cards, cart drawer and checkout.
+- **GitHub Pages is static hosting**, so the live site reads the exported JSON, not a running database. That keeps hosting free and fast, with no server to secure.
 
-This keeps the "no backend" starter-site philosophy: no database, no payment gateway, no server. All order confirmation and payment happens over WhatsApp, same as the original quote request flow. See "Production recommendations" below for what to add if the business outgrows this.
+## Changing prices, stock or products
+
+1. Edit the row in `db/seed.sql` (e.g. change `150` to `180`, or set `'in'` to `'out'`).
+2. Regenerate the catalog:
+   ```bash
+   python3 scripts/build_catalog.py
+   ```
+3. Commit **both** `db/seed.sql` and `data/products.json`, push a branch, open a PR, merge.
+
+CI fails the build if the SQL is invalid or if `data/products.json` was not regenerated, so the live shop can never drift from the database.
+
+To add a product, copy a row, give it a unique SKU (`A-Z`, `0-9`, `-`), a `category_id` from the categories list, and a price. To add a photo, put it in `assets/` and set `image_url` to `assets/your-file.jpg`.
 
 ## Run locally
 
-Open `index.html` directly in a browser, or run a local server:
-
 ```bash
-cd vicspark-website
-python3 -m http.server 8000
+python3 scripts/build_catalog.py     # builds data/products.json
+python3 -m http.server 8000          # then open http://localhost:8000
 ```
 
-Then visit `http://localhost:8000`.
+Open it through a local server (not by double-clicking `index.html`), because the browser blocks loading the JSON from `file://`.
 
-## Business details used
+Optional: inspect the database with `python3 scripts/build_catalog.py --keep-db build/vicspark.db`, then `sqlite3 build/vicspark.db`.
 
-- Business: VICSpark Electrical Works
-- Services: Sales • Installation • Repairs
+## Deployment (GitHub Actions to GitHub Pages)
+
+`.github/workflows/deploy.yml`:
+
+- **Pull requests to `main`**: validates the database, checks the JSON is current, syntax-checks the JavaScript. Nothing is deployed.
+- **Push to `main`**: runs the same checks, assembles only the website files (`index.html`, `css/`, `js/`, `assets/`, `data/`) and deploys them. `db/`, `scripts/` and docs are not published.
+
+## Scaling path
+
+| Stage | When | What changes |
+|---|---|---|
+| 1. Now | Dozens to a few hundred products, orders via WhatsApp | Static site built from SQL (this repo) |
+| 2. Live backend | You want live stock, stored orders, or M-Pesa payments | Run `db/schema.sql` on managed PostgreSQL (e.g. Supabase or Neon), add a small API, write to `orders` / `order_items` (already modeled) |
+| 3. Growth | Many products, staff users | Admin dashboard on top of the same tables |
+
+The schema uses portable SQL (text keys, no vendor-specific auto-increment), so moving from SQLite to PostgreSQL is mostly a matter of running the same files.
+
+## Security notes
+
+- No secrets, credentials or API keys are stored in this repo.
+- Product data is HTML-escaped before it is rendered; saved carts are validated against the catalog on load.
+- The deploy workflow only publishes the website folder and only deploys from `main`.
+- Prices shown on the site are for convenience. The business confirms final price and stock on WhatsApp before any sale.
+
+## Business details
+
+- Business: VICSpark Electrical Works, Malindi, Kenya
+- Services: Sales, Installation, Repairs
 - Phone/WhatsApp: 0791 495 748
-- Location: Malindi, Kenya
-
-## Form behavior
-
-- The quote form (`#quoteForm`) does not require a backend. JavaScript converts the submitted details into a pre-filled WhatsApp message sent to the business number.
-- The checkout form (`#checkoutForm`) works the same way: it reads the current cart, builds an itemized message with subtotal, opens WhatsApp with it pre-filled, then clears the cart.
-
-## Editing products
-
-Open `js/shop.js` and edit the `PRODUCTS` array:
-
-```js
-{ id: 'led-9w', name: 'LED Bulb 9W', category: 'lighting', price: 200, icon: '💡', stock: 'in' }
-```
-
-- `category` must match one of the ids in `CATEGORIES` (`cables`, `breakers`, `switches`, `lighting`), or add a new category entry.
-- `stock` accepts `'in'`, `'low'`, or `'out'` (out-of-stock items are dimmed and disabled).
-- `WHATSAPP_NUMBER` and `CURRENCY` are set near the top of the same file.
-
-## Production recommendations
-
-1. Replace the poster image with optimized WebP/AVIF brand assets where possible.
-2. Add a real domain and HTTPS.
-3. Add a backend/API if orders/enquiries need to be stored in a database instead of only sent via WhatsApp (also enables real payment collection, e.g. M-Pesa STK push).
-4. Add Google Business Profile, analytics and Search Console after launch.
-5. Add real product photos to replace the placeholder emoji icons in `js/shop.js`.
-6. Add an email address once the business has a dedicated mailbox.
-7. Consider a small CMS or admin dashboard (or just editing `PRODUCTS` in `js/shop.js` directly) when products/prices/stock need frequent updates.
-8. If order volume grows, replace the WhatsApp-only checkout with a real payment gateway (M-Pesa Daraja API, Stripe, etc.) and order database.
